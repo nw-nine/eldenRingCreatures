@@ -1,23 +1,39 @@
 import logo from './logo.svg';
 import './App.css';
+import React, { useEffect, useState} from "react"
+import Monsters from "./Monsters"
 
 function App() {
+
+  const [currentMonster, setCurrentMonster] = useState([])
+  const [monsters, setMonsters] = useState({})
+
+
+
+useEffect(() => {
+  let abortController = new AbortController()
+  fetch("https://eldenring.fanapis.com/api/creatures",
+  { signal: abortController.signal })
+  .then(response => response.json())
+  .then(data => setMonsters(data))
+  .catch(e => {
+    if (e.name !== 'AbortError') {
+      throw e;
+    }
+  });
+return () => {
+  console.log('we are running the cleanup function')
+  abortController.abort()
+};
+}, [])
+
+console.log(monsters);
+
+
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Monsters monsters={monsters} />
     </div>
   );
 }
